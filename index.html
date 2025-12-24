@@ -45,11 +45,11 @@
         /* The Main App Container */
         #app-container {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
+            flex-direction: column; /* Mobile stack */
+            gap: 30px;
             width: 100%;
-            max-width: 900px;
+            max-width: 1200px;
+            margin-top: 20px;
         }
 
         /* Canvas Area */
@@ -157,9 +157,24 @@
             font-size: 16px;
         }
 
-        @media (min-width: 768px) {
-            #app-container { flex-direction: row; align-items: flex-start; }
-            .side-controls { width: 400px; display: flex; flex-direction: column; gap: 20px; }
+        /* Desktop 3-Column View */
+        @media (min-width: 1024px) {
+            #app-container {
+                flex-direction: row;
+                align-items: flex-start;
+                justify-content: space-between;
+            }
+
+            .column-preview { flex: 1.5; } /* Give the image more space */
+            .column-picker  { flex: 1; display: flex; justify-content: center; }
+            .column-channels { flex: 1; }
+        }
+
+        /* Specific Channel Grid for the 3rd Column */
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 2 columns of buttons */
+            gap: 10px;
         }
 
         /* Style for the Randomize 'Channel' */
@@ -198,17 +213,21 @@
     </header>
 
     <div id="app-container">
-        <div class="canvas-container">
-            <canvas id="recolorCanvas"></canvas>
-            <div id="loadingMessage" style="padding: 20px; color: white; text-align: center;">Loading Imp...</div>
+        <div class="column-preview">
+            <div class="canvas-container">
+                <canvas id="recolorCanvas"></canvas>
+                <div id="loadingMessage" style="padding: 20px; color: white; text-align: center;">Loading Imp...</div>
+            </div>
         </div>
-
-        <div class="side-controls">
+        <div class="column-picker">
             <div id="picker-section">
                 <div id="iroPicker"></div>
             </div>
+        </div>        
 
-            <div id="controls" class="controls-wrapper">
+        <div class="column-channels">
+
+            <div id="controls" class="controls-grid">
                 <div class="channel-item active-channel" data-id="Skin">
                     <label>Skin</label>
                     <input type="color" id="Skin" value="#50C878" data-mask-r="255" data-mask-g="0" data-mask-b="255">
