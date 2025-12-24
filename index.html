@@ -312,7 +312,12 @@
         const controls = document.getElementById('controls');
         const loadingMessage = document.getElementById('loadingMessage');
         const canvasContainer = document.querySelector('.canvas-container'); // Reference to the container
-        
+        const randomBtn = document.getElementById('randomBtn');
+
+        if (randomBtn) {
+            randomBtn.addEventListener('click', randomizeAll);
+        }
+
         // Data stores
         let baseImageData = null; // Stores the "photographic" data
         let maskImageData = null; // Stores the pure mask colors (R, G, B, Y)
