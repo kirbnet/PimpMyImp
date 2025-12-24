@@ -42,16 +42,44 @@
 
         .header img { max-width: 200px; margin-bottom: 20px; }
 
-        /* The Main App Container */
+        /* Base: Mobile View (1 Column) */
         #app-container {
-            display: flex;
-            flex-direction: column; /* Mobile stack */
-            gap: 30px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
             width: 100%;
-            max-width: 1200px;
-            margin-top: 20px;
+            max-width: 1400px;
         }
 
+        /* Medium Screens: 2 Columns (Image on Left, Controls on Right) */
+        @media (min-width: 768px) {
+            #app-container {
+                grid-template-columns: 1.2fr 1fr; /* Image is slightly wider than controls */
+                align-items: start;
+            }
+            
+            /* On 2-column mode, we stack the Picker and Channels in the 2nd column */
+            .column-picker, .column-channels {
+                grid-column: 2;
+            }
+
+            /* Sticky the preview pane */
+            .column-preview {
+                position: sticky;
+                top: 20px;
+            }
+        }
+
+        /* Very Wide Screens: 3 Columns (Side-by-Side-by-Side) */
+        @media (min-width: 1200px) {
+            #app-container {
+                grid-template-columns: 1.5fr 1fr 1fr;
+            }
+
+            .column-preview { grid-column: 1; }
+            .column-picker   { grid-column: 2; }
+            .column-channels { grid-column: 3; }
+        }
         /* Canvas Area */
         .canvas-container {
             width: 100%;
@@ -97,6 +125,7 @@
             letter-spacing: 0.05em;
             opacity: 0.9;
         }
+
         /* 9 Channel Grid */
         .controls-wrapper {
             display: grid;
@@ -155,19 +184,6 @@
             font-weight: bold;
             cursor: pointer;
             font-size: 16px;
-        }
-
-        /* Desktop 3-Column View */
-        @media (min-width: 1024px) {
-            #app-container {
-                flex-direction: row;
-                align-items: flex-start;
-                justify-content: space-between;
-            }
-
-            .column-preview { flex: 1.5; } /* Give the image more space */
-            .column-picker  { flex: 1; display: flex; justify-content: center; }
-            .column-channels { flex: 1; }
         }
 
         /* Specific Channel Grid for the 3rd Column */
@@ -284,9 +300,12 @@
 
         // 1. Initialize iro.js
         const picker = new iro.ColorPicker("#iroPicker", {
-            width: 220,
+            width: document.getElementById('picker-section').offsetWidth - 40, 
             color: activeInput.value,
-            layout: [{ component: iro.ui.Wheel }, { component: iro.ui.Slider, options: { sliderType: 'value' } }]
+            layout: [
+                { component: iro.ui.Wheel },
+                { component: iro.ui.Slider, options: { sliderType: 'value' } }
+            ]
         });
 
         // 2. Color Wheel Events
