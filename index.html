@@ -72,6 +72,7 @@
         .header {
             text-align: center;
             margin-bottom: 2.5rem; /* mb-10 */
+
         }
 
         .header h1 {
@@ -79,6 +80,12 @@
             font-weight: 800; /* extabold */
             color: var(--color-text-header);
             margin-bottom: 0.5rem; /* mb-2 */
+        }
+
+        .header img {
+            max-width: 200px;
+            height: auto;
+            display: block;
         }
 
         .header p {
@@ -258,6 +265,10 @@
                     <div class="channel-item">
                         <label for="Horns">Horns</label>
                         <input type="color" id="Horns" value="#50C878" data-mask-r="255" data-mask-g="102" data-mask-b="0">
+                    </div>
+                    <div class="channel-item">
+                        <label for="Eyes">Eyes</label>
+                        <input type="color" id="Eyes" value="#50C878" data-mask-r="0" data-mask-g="0" data-mask-b="255">
                     </div>
                     <div class="channel-item">
                         <label for="Cloth">Cloth</label>
