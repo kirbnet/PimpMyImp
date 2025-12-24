@@ -329,7 +329,6 @@
         }
 
         function randomizeAll() {
-            // 1. For Color Pickers (input type="color")
             const colorInputs = document.querySelectorAll('input[type="color"]');
             colorInputs.forEach(input => {
                 input.value = getRandomColor();
@@ -337,13 +336,6 @@
                 input.dispatchEvent(new Event('input')); 
             });
 
-            // 2. For Dropdowns (select)
-            const selects = document.querySelectorAll('select');
-            selects.forEach(select => {
-                const randomIndex = Math.floor(Math.random() * select.options.length);
-                select.selectedIndex = randomIndex;
-                select.dispatchEvent(new Event('change'));
-            });
         }
 
         // Run on page load
