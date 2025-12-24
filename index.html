@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pimp My Imp</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- CSS VARIABLES FOR THEMEING --- */
+        :root {
+            /* Light Mode Defaults */
+            --color-bg-body: #f9fafb;
+            --color-bg-panel: #ffffff;
+            --color-text-header: #1f2937;
+            --color-text-paragraph: #6b7280;
+            --color-text-label: #4b5563;
+            --color-border-item: #e5e7eb;
+            --color-bg-canvas-inner: #374151; /* Placeholder/border color around canvas */
+            --color-border-canvas: #374151;
+            
+            /* Loading Message Colors (Light) */
+            --color-bg-loading: #fffbe3;
+            --color-text-loading: #92400e;
+            --color-bg-error: #fee2e2;
+            --color-text-error: #991b1b;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                /* Dark Mode Overrides */
+                --color-bg-body: #111827;
+                --color-bg-panel: #1f2937;
+                --color-text-header: #f9fafb;
+                --color-text-paragraph: #9ca3af;
+                --color-text-label: #d1d5db;
+                --color-border-item: #374151;
+                --color-bg-canvas-inner: #4b5563;
+                --color-border-canvas: #4b5563;
+
+                /* Loading Message Colors (Dark) */
+                --color-bg-loading: #92400e;
+                --color-text-loading: #fffbe3;
+                --color-bg-error: #991b1b;
+                --color-text-error: #fee2e2;
+            }
+        }
+        
+        /* --- GLOBAL & TYPOGRAPHY --- */
+        body { 
+            font-family: 'Inter', sans-serif; 
+            min-height: 100vh;
+            padding: 1rem; /* p-4 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: var(--color-bg-body);
+            transition: background-color 0.3s;
+        }
+
+        @media (min-width: 768px) {
+            body {
+                padding: 2rem; /* md:p-8 */
+            }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 896px; /* max-w-4xl */
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2.5rem; /* mb-10 */
+        }
+
+        .header h1 {
+            font-size: 1.875rem; /* 3xl */
+            font-weight: 800; /* extabold */
+            color: var(--color-text-header);
+            margin-bottom: 0.5rem; /* mb-2 */
+        }
+
+        .header p {
+            color: var(--color-text-paragraph);
+        }
+
+        @media (min-width: 768px) {
+            .header h1 {
+                font-size: 2.25rem; /* md:text-4xl */
+            }
+        }
+
+        /* --- MAIN LAYOUT --- */
+        .main-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem; /* gap-8 */
+        }
+
+        @media (min-width: 1024px) {
+            .main-layout {
+                flex-direction: row; /* lg:flex-row */
+            }
+            .controls-panel {
+                width: 33.3333%; /* lg:w-1/3 */
+            }
+            .canvas-area {
+                width: 66.6667%; /* lg:w-2/3 */
+            }
+        }
+
+        /* --- CONTROL PANEL STYLING --- */
+        .controls-panel, .canvas-area-wrapper {
+            background-color: var(--color-bg-panel);
+            padding: 1.5rem; /* p-6 */
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+            transition: background-color 0.3s;
+        }
+
+        .controls-panel h2 {
+            font-size: 1.25rem; /* xl */
+            font-weight: bold;
+            margin-bottom: 1.25rem; /* mb-5 */
+            color: var(--color-text-header);
+        }
+
+        .controls-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem; /* space-y-4 */
+        }
+
+        .channel-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem; /* p-3 */
+            border: 1px solid var(--color-border-item);
+            border-radius: 0.5rem; /* rounded-lg */
+        }
+
+        .channel-item label {
+            font-weight: 500;
+            color: var(--color-text-label);
+        }
+
+        .footer-note {
+            margin-top: 1.5rem; /* mt-6 */
+            font-size: 0.875rem; /* text-sm */
+            color: var(--color-text-paragraph);
+            opacity: 0.7;
+        }
+
+        /* --- COLOR PICKER STYLING --- */
+        input[type="color"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            border: none;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.15s;
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: none; }
+        input[type="color"]::-moz-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-moz-color-swatch { border: none; }
+
+        /* --- CANVAS STYLING --- */
+        .canvas-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .canvas-container {
+            width: 100%;
+            height: auto;
+            max-width: 512px; /* max-w-lg */
+            margin-left: auto;
+            margin-right: auto;
+            background-color: var(--color-bg-canvas-inner);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            border: 4px solid var(--color-border-canvas);
+            transition: background-color 0.3s, border-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* REMOVED fixed aspect-ratio: 1 / 1; will be set dynamically by JS */
+        }
+        
+        #recolorCanvas {
+            width: 100%;
+            height: 100%;
+            display: block; 
+        }
+
+        /* --- LOADING MESSAGE STYLING --- */
+        .loading-message {
+            margin-top: 1.5rem; /* mt-6 */
+            padding: 1rem; /* p-4 */
+            border-radius: 0.5rem; /* rounded-lg */
+            
+            /* Apply dynamic colors via variables */
+            background-color: var(--color-bg-loading);
+            color: var(--color-text-loading);
+        }
+        
+        .loading-message.error {
+            background-color: var(--color-bg-error);
+            color: var(--color-text-error);
+        }
+        
+        .hidden {
+            display: none;
+        }
+
+    </style>
+</head>
+<body class="theme-aware">
+
+    <div class="container">
+       <header class="header">
+            <img src="images/PimpMyImpLogo.png" alt="Pimp My Imp"/>
+        </header>
+
+        <main class="main-layout">
+            
+            <!-- Color Controls Panel -->
+            <div class="controls-panel">
+                <h2>Customization Channels</h2>
+
+                <div id="controls" class="controls-wrapper">
+                    <div class="channel-item">
+                        <label for="Skin">Skin</label>
+                        <input type="color" id="Skin" value="#50C878" data-mask-r="255" data-mask-g="0" data-mask-b="255">
+                    </div>
+                    <div class="channel-item">
+                        <label for="Armor1">Main Armor</label>
+                        <input type="color" id="Armor1" value="#50C878" data-mask-r="255" data-mask-g="255" data-mask-b="0">
+                    </div>
+                    <div class="channel-item">
+                        <label for="Armor2">Armor 2</label>
+                        <input type="color" id="Armor 2" value="#50C878" data-mask-r="0" data-mask-g="255" data-mask-b="255">
+                    </div>
+                    <div class="channel-item">
+                        <label for="Armor3">Armor 3</label>
+                        <input type="color" id="Armor 3" value="#50C878" data-mask-r="255" data-mask-g="0" data-mask-b="0">
+                    </div>
+                    <div class="channel-item">
+                        <label for="Horns">Horns</label>
+                        <input type="color" id="Horns" value="#50C878" data-mask-r="255" data-mask-g="102" data-mask-b="0">
+                    </div>
+                    <div class="channel-item">
+                        <label for="Cloth">Cloth</label>
+                        <input type="color" id="Cloth" value="#50C878" data-mask-r="128" data-mask-g="0" data-mask-b="128">
+                    </div>
+                    <div class="channel-item">
+                        <label for="Cloth2">Cloth 2</label>
+                        <input type="color" id="Cloth 2" value="#50C878" data-mask-r="200" data-mask-g="113" data-mask-b="55">
+                    </div>
+                    <div class="channel-item">
+                        <label for="Leather">Leather</label>
+                        <input type="color" id="Leater" value="#50C878" data-mask-r="0" data-mask-g="255" data-mask-b="0">
+                    </div>
+                </div>
+
+                <div id="loadingMessage" class="loading-message hidden">
+                    Loading images...
+                </div>
+
+                <p class="footer-note">
+                </p>
+            </div>
+
+            <!-- Canvas Display Area -->
+            <div class="canvas-area canvas-area-wrapper">
+                <div class="canvas-container">
+                    <canvas id="recolorCanvas"></canvas>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script type="text/javascript">
+        // Global references
+        const canvas = document.getElementById('recolorCanvas');
+        const ctx = canvas.getContext('2d');
+        const controls = document.getElementById('controls');
+        const loadingMessage = document.getElementById('loadingMessage');
+        const canvasContainer = document.querySelector('.canvas-container'); // Reference to the container
+        
+        // Data stores
+        let baseImageData = null; // Stores the "photographic" data
+        let maskImageData = null; // Stores the pure mask colors (R, G, B, Y)
+        
+        let imageWidth = 0;
+        let imageHeight = 0;
+
+        // --- HSL/RGB Conversion Utilities (Crucial for luminosity preservation) ---
+
+        /** Converts RGB (0-255) to HSL (H:0-360, S:0-100, L:0-100) */
+        function rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+
+            if (max === min) { h = s = 0; } 
+            else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+            return [h * 360, s * 100, l * 100];
+        }
+
+        /** Converts HSL (H:0-360, S:0-100, L:0-100) to RGB (0-255) */
+        function hslToRgb(h, s, l) {
+            h /= 360; s /= 100; l /= 100;
+            let r, g, b;
+
+            if (s === 0) {
+                r = g = b = l; 
+            } else {
+                const hue2rgb = (p, q, t) => {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1 / 6) return p + (q - p) * 6 * t;
+                    if (t < 1 / 2) return q;
+                    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+                    return p;
+                };
+
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1 / 3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1 / 3);
+            }
+
+            return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+        }
+        
+        /** Converts a hex color string (e.g., "#RRGGBB") to HSL [H, S, L]. */
+        function hexToHsl(hex) {
+            const bigint = parseInt(hex.slice(1), 16);
+            const r = (bigint >> 16) & 255;
+            const g = (bigint >> 8) & 255;
+            const b = bigint & 255;
+            return rgbToHsl(r, g, b);
+        }
+
+
+        // --- Image Loading and Initialization ---
+
+        /**
+         * Loads a single image into the browser and returns its pixel data.
+         * @param {string} imageUrl - The source URL/filename of the image.
+         * @returns {Promise<ImageData>} A promise that resolves with the ImageData object.
+         */
+        function loadImageData(imageUrl) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                // Check for a placeholder image if the primary one is missing
+                img.onerror = () => {
+                    // Fallback to a placehold.co link if image is not found
+                    console.warn(`Image '${imageUrl}' not found. Using placeholder.`);
+                    img.src = `https://placehold.co/512x512/374151/ffffff?text=Image+Missing`;
+                    img.onerror = (e) => reject(new Error(`Failed to load placeholder: ${e.message}`));
+                };
+                img.src = imageUrl; 
+
+                img.onload = function() {
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = img.width;
+                    tempCanvas.height = img.height;
+                    const tempCtx = tempCanvas.getContext('2d');
+                    tempCtx.drawImage(img, 0, 0);
+                    resolve(tempCtx.getImageData(0, 0, img.width, img.height));
+                };
+            });
+        }
+
+        /**
+         * Loads both the base photographic image and the mask image.
+         * @param {string} baseImageUrl - Path to the photo (imp.png).
+         * @param {string} maskImageUrl - Path to the mask (pure R/G/B/Y colors).
+         */
+        async function loadBaseAndMaskImages(baseImageUrl, maskImageUrl) {
+            loadingMessage.textContent = `Loading ${baseImageUrl} and ${maskImageUrl}...`;
+            loadingMessage.classList.remove('hidden');
+            loadingMessage.classList.remove('error');
+
+            try {
+                // Load both images concurrently
+                const [baseData, maskData] = await Promise.all([
+                    loadImageData(baseImageUrl),
+                    loadImageData(maskImageUrl)
+                ]);
+
+                // Store data
+                baseImageData = baseData;
+                maskImageData = maskData;
+
+                // Set main canvas dimensions based on the base image
+                imageWidth = baseImageData.width;
+                imageHeight = baseImageData.height;
+                canvas.width = imageWidth;
+                canvas.height = imageHeight;
+                
+                // *** FIX: Dynamically set the container's aspect ratio ***
+                // This ensures the image is not stretched when scaled by the browser, 
+                // as the container now matches the image's native proportion.
+                canvasContainer.style.aspectRatio = `${imageWidth} / ${imageHeight}`;
+
+
+                console.log(`Images loaded successfully. Dimensions: ${imageWidth}x${imageHeight}`);
+                loadingMessage.classList.add('hidden');
+                recolorImage(); 
+
+            } catch (error) {
+                console.error("Initialization error:", error);
+                loadingMessage.textContent = `Error loading images. Check console for details. Files may not be accessible: ${baseImageUrl}, ${maskImageUrl}`;
+                loadingMessage.classList.remove('hidden');
+                loadingMessage.classList.add('error');
+            }
+        }
+
+        // --- Core Recolor Logic ---
+
+        /**
+         * Reapplies new color Hues and Saturations to the base image, 
+         * using the original image's Luminosity (L) for realism.
+         */
+        function recolorImage() {
+            if (!baseImageData || !maskImageData) return;
+
+            // 1. Get current color selections and calculate their HSL values
+            const colorInputs = Array.from(controls.querySelectorAll('input[type="color"]'));
+            
+            const colorMap = colorInputs.map(input => ({
+                // The mask color we are looking for in the mask image
+                maskR: parseInt(input.dataset.maskR),
+                maskG: parseInt(input.dataset.maskG),
+                maskB: parseInt(input.dataset.maskB),
+                newHsl: hexToHsl(input.value) // The HSL of the user's color picker choice
+            }));
+
+            // Create the canvas context for the result
+            const newImageData = ctx.createImageData(imageWidth, imageHeight);
+            const resultData = newImageData.data;
+            const baseData = baseImageData.data;
+            const maskData = maskImageData.data;
+            const length = baseData.length;
+
+            // 2. Iterate through every pixel
+            for (let i = 0; i < length; i += 4) {
+                
+                // Get the mask pixel color (tells us which area we are in)
+                const maskR = maskData[i];
+                const maskG = maskData[i + 1];
+                const maskB = maskData[i + 2];
+
+                let match = false;
+
+                // Check against each defined color mask
+                for (const { maskR: mR, maskG: mG, maskB: mB, newHsl } of colorMap) {
+                    
+                    // Simple, exact match for the mask color 
+                    if (maskR === mR && maskG === mG && maskB === mB) {
+                        match = true;
+                        
+                        // Get the Luminosity (L) from the corresponding BASE IMAGE pixel
+                        const baseR = baseData[i];
+                        const baseG = baseData[i + 1];
+                        const baseB = baseData[i + 2];
+                        
+                        // Calculate the original Luminosity
+                        const [, , originalLuminosity] = rgbToHsl(baseR, baseG, baseB);
+                        
+                        // Blend: Use the new Hue (H) and Saturation (S) from the user's color 
+                        // and the original Luminosity (L) from the base image.
+                        const [newR, newG, newB] = hslToRgb(newHsl[0], newHsl[1], originalLuminosity);
+                        
+                        // Apply the new color to the result data
+                        resultData[i] = newR;
+                        resultData[i + 1] = newG;
+                        resultData[i + 2] = newB;
+                        resultData[i + 3] = baseData[i + 3]; // Keep base image's alpha/transparency
+                        
+                        break;
+                    }
+                }
+                
+                // If the pixel didn't match any mask color, keep the original base color
+                if (!match) {
+                    resultData[i] = baseData[i];
+                    resultData[i + 1] = baseData[i + 1];
+                    resultData[i + 2] = baseData[i + 2];
+                    resultData[i + 3] = baseData[i + 3];
+                }
+            }
+
+            // 3. Put the newly colored image data back onto the canvas
+            ctx.putImageData(newImageData, 0, 0);
+        }
+
+        // --- Event Listeners and Initialization ---
+
+        window.onload = function() {
+            // Base image is the photo.
+            const BASE_IMAGE_URL = 'images/imp.png'; 
+            
+            // Mask image is the R,G,B,Y colored areas.
+            const MASK_IMAGE_URL = 'images/imp.png'; 
+
+            loadBaseAndMaskImages(BASE_IMAGE_URL, MASK_IMAGE_URL);
+
+            // Attach listeners to the color pickers
+            controls.addEventListener('input', (event) => {
+                if (event.target.type === 'color') {
+                    recolorImage();
+                }
+            });
+        };
+    </script>
+</body>
+</html>
