@@ -61,11 +61,30 @@
         /* Container for the whole app */
         #app-container {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
+            flex-direction: column; /* Stack vertically for now */
+            align-items: center;
+            width: 100%;
+            min-height: 100vh;
         }
 
+        /* Ensure the preview section doesn't collapse */
+        #preview-section {
+            width: 100%;
+            max-width: 600px; /* Adjust to your character's size */
+            min-height: 300px; /* Give it a fallback height */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Force the canvas/image to be visible */
+        #preview-section canvas, 
+        #preview-section img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
         @media (min-width: 768px) {
             body {
                 padding: 2rem; /* md:p-8 */
@@ -242,7 +261,6 @@
         }
 
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
 </head>
 <body class="theme-aware">
 
