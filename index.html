@@ -269,7 +269,10 @@
                     </div>
                     <div class="channel-item">
                         <label for="Leather">Leather</label>
-                        <input type="color" id="Leater" value="#50C878" data-mask-r="0" data-mask-g="255" data-mask-b="0">
+                        <input type="color" id="Leather" value="#50C878" data-mask-r="0" data-mask-g="255" data-mask-b="0">
+                    </div>
+                    <div class="channel-item">
+                        <button onclick="randomizeAll()" class="random-btn">🎲 Rando My Imp!</button>
                     </div>
                 </div>
 
@@ -306,6 +309,36 @@
         let imageWidth = 0;
         let imageHeight = 0;
 
+        // Random functions
+
+        // List of colors to choose from if you use a dropdown, 
+        // or it will generate HEX codes for color pickers.
+        function getRandomColor() {
+            return '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+        }
+
+        function randomizeAll() {
+            // 1. For Color Pickers (input type="color")
+            const colorInputs = document.querySelectorAll('input[type="color"]');
+            colorInputs.forEach(input => {
+                input.value = getRandomColor();
+                // Trigger the change event so the preview updates
+                input.dispatchEvent(new Event('input')); 
+            });
+
+            // 2. For Dropdowns (select)
+            const selects = document.querySelectorAll('select');
+            selects.forEach(select => {
+                const randomIndex = Math.floor(Math.random() * select.options.length);
+                select.selectedIndex = randomIndex;
+                select.dispatchEvent(new Event('change'));
+            });
+        }
+
+        // Run on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            randomizeAll();
+        });
         // --- HSL/RGB Conversion Utilities (Crucial for luminosity preservation) ---
 
         /** Converts RGB (0-255) to HSL (H:0-360, S:0-100, L:0-100) */
