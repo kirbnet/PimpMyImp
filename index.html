@@ -161,6 +161,34 @@
             #app-container { flex-direction: row; align-items: flex-start; }
             .side-controls { width: 400px; display: flex; flex-direction: column; gap: 20px; }
         }
+
+        /* Style for the Randomize 'Channel' */
+        .random-item {
+            background: #50C878 !important; /* Use your brand green */
+            border-color: #45b36b !important;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: transform 0.1s ease;
+        }
+
+        .random-item label {
+            color: white !important;
+            margin-bottom: 2px;
+        }
+
+        .random-item .dice-icon {
+            font-size: 24px;
+            line-height: 1;
+        }
+
+        .random-item:active {
+            transform: scale(0.95);
+            background: #45b36b !important;
+        }
+
+        /* Ensure the grid doesn't have a giant button at the bottom anymore */
+        .random-btn { display: none; }
     </style>
 </head>
 <body>
@@ -217,8 +245,10 @@
                     <label>Leather</label>
                     <input type="color" id="Leather" value="#50C878" data-mask-r="0" data-mask-g="255" data-mask-b="0">
                 </div>
-                
-                <button onclick="randomizeAll()" class="random-btn">🎲 Rando My Imp!</button>
+                <div class="channel-item random-item" onclick="randomizeAll()">
+                    <label>Yo!</label>
+                    <div class="dice-icon">🎲</div>
+                </div>
             </div>
         </div>
     </div>
@@ -250,15 +280,17 @@
 
         // 3. Channel Selection Logic
         document.querySelectorAll('.channel-item').forEach(item => {
-            item.addEventListener('click', () => {
-                document.querySelectorAll('.channel-item').forEach(i => i.classList.remove('active-channel'));
-                item.classList.add('active-channel');
-                activeInput = item.querySelector('input');
-                picker.color.set(activeInput.value);
-                if (window.innerWidth < 768) {
-                    document.getElementById('picker-section').scrollIntoView({ behavior: 'smooth' });
-                }
-            });
+            if (!item.classList.contains('random-item')) {
+                item.addEventListener('click', () => {
+                    document.querySelectorAll('.channel-item').forEach(i => i.classList.remove('active-channel'));
+                    item.classList.add('active-channel');
+                    activeInput = item.querySelector('input');
+                    picker.color.set(activeInput.value);
+                    if (window.innerWidth < 768) {
+                        document.getElementById('picker-section').scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            }
         });
 
         // --- Recolor Logic ---
