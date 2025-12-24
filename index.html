@@ -172,9 +172,18 @@
             box-shadow: 0 0 15px rgba(80, 200, 120, 0.2);
         }
 
+        /* The Visual Haptic Style */
         .channel-item.active-channel {
-            border-color: #50C878;
-            background: rgba(80, 200, 120, 0.1);
+            /* The variable --active-color will be updated by JavaScript */
+            border-color: var(--active-color, #50C878) !important;
+            box-shadow: 0 0 20px var(--active-color, rgba(80, 200, 120, 0.3));
+            background: rgba(255, 255, 255, 0.05);
+            transform: scale(1.02);
+            transition: all 0.1s ease-out;
+        }
+
+        .active-channel label {
+            text-shadow: 0 0 8px var(--active-color);
         }
 
         .channel-item label {
@@ -404,6 +413,7 @@
         picker.on('color:change', (color) => {
             if (activeInput) {
                 activeInput.value = color.hexString;
+                document.documentElement.style.setProperty('--active-color', color.hexString);
                 recolorImage();
             }
         });
@@ -415,6 +425,7 @@
                     document.querySelectorAll('.channel-item').forEach(i => i.classList.remove('active-channel'));
                     item.classList.add('active-channel');
                     activeInput = item.querySelector('input');
+                    document.documentElement.style.setProperty('--active-color', activeInput.value);
                     picker.color.set(activeInput.value);
                     if (window.innerWidth < 768) {
                         document.getElementById('picker-section').scrollIntoView({ behavior: 'smooth' });
