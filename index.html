@@ -220,6 +220,38 @@
 
         /* Ensure the grid doesn't have a giant button at the bottom anymore */
         .random-btn { display: none; }
+
+        /* fullscreen preview */
+        .canvas-container {
+            position: relative; /* Required for absolute positioning of the button */
+        }
+
+        .fullscreen-btn {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            backdrop-filter: blur(4px); /* Modern frosted glass effect */
+            transition: background 0.2s;
+        }
+
+        .fullscreen-btn:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        /* Ensure the canvas looks good when it fills the screen */
+        #recolorCanvas:fullscreen {
+            background-color: #111;
+            object-fit: contain; /* Prevents stretching */
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
@@ -230,8 +262,9 @@
 
     <div id="app-container">
         <div class="column-preview">
-            <div class="canvas-container">
+            <div class="canvas-container" id="canvas-wrapper">
                 <canvas id="recolorCanvas"></canvas>
+                <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
                 <div id="loadingMessage" style="padding: 20px; color: white; text-align: center;">Loading Imp...</div>
             </div>
         </div>
@@ -428,6 +461,27 @@
                 img.onerror = rej;
                 img.src = url;
             });
+        }
+
+        // Send image to fullscreen
+        function toggleFullscreen() {
+            const canvas = document.getElementById('recolorCanvas');
+
+            if (!document.fullscreenElement) {
+                // Enter Fullscreen
+                if (canvas.requestFullscreen) {
+                    canvas.requestFullscreen();
+                } else if (canvas.webkitRequestFullscreen) { /* Safari */
+                    canvas.webkitRequestFullscreen();
+                } else if (canvas.msRequestFullscreen) { /* IE11 */
+                    canvas.msRequestFullscreen();
+                }
+            } else {
+                // Exit Fullscreen
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
         }
 
         function randomizeAll() {
