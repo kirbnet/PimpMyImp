@@ -58,6 +58,14 @@
             transition: background-color 0.3s;
         }
 
+        /* Container for the whole app */
+        #app-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
         @media (min-width: 768px) {
             body {
                 padding: 2rem; /* md:p-8 */
@@ -117,6 +125,12 @@
             }
         }
 
+        @media (max-width: 600px) {
+            #controls {
+                grid-template-columns: 1fr 1fr; /* 2 columns on small phones */
+            }
+        }
+
         /* --- CONTROL PANEL STYLING --- */
         .controls-panel, .canvas-area-wrapper {
             background-color: var(--color-bg-panel);
@@ -134,23 +148,39 @@
         }
 
         .controls-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem; /* space-y-4 */
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+            max-width: 500px;
         }
 
         .channel-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.75rem; /* p-3 */
-            border: 1px solid var(--color-border-item);
-            border-radius: 0.5rem; /* rounded-lg */
+            background: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            transition: 0.2s;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .channel-item.active-channel {
+            border-color: #50C878;
+            box-shadow: 0 0 10px rgba(80, 200, 120, 0.2);
         }
 
         .channel-item label {
-            font-weight: 500;
             color: var(--color-text-label);
+            display: block;
+            font-size: 12px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .channel-item input[type="color"] {
+            width: 100%;
+            height: 30px;
+            cursor: pointer;
         }
 
         .footer-note {
@@ -159,25 +189,6 @@
             color: var(--color-text-paragraph);
             opacity: 0.7;
         }
-
-        /* --- COLOR PICKER STYLING --- */
-        input[type="color"] {
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            border: none;
-            padding: 0;
-            width: 40px;
-            height: 40px;
-            cursor: pointer;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            transition: box-shadow 0.15s;
-        }
-        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-        input[type="color"]::-webkit-color-swatch { border: none; }
-        input[type="color"]::-moz-color-swatch-wrapper { padding: 0; }
-        input[type="color"]::-moz-color-swatch { border: none; }
 
         /* --- CANVAS STYLING --- */
         .canvas-area {
@@ -231,6 +242,7 @@
         }
 
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
 </head>
 <body class="theme-aware">
 
@@ -240,11 +252,20 @@
         </header>
 
         <main class="main-layout">
+            <div id="app-container">
+                <div id="preview-section">
+                    <!-- Canvas Display Area -->
+                    <div class="canvas-area canvas-area-wrapper">
+                        <div class="canvas-container">
+                            <canvas id="recolorCanvas"></canvas>
+                        </div>
+                    </div>
+                </div>
             
-            <!-- Color Controls Panel -->
-            <div class="controls-panel">
-                <h2>Customization Channels</h2>
-
+                <div id="picker-section" style="text-align:center; padding: 20px;">
+                    <div id="iroPicker"></div>
+                </div>
+            
                 <div id="controls" class="controls-wrapper">
                     <div class="channel-item">
                         <label for="Skin">Skin</label>
@@ -286,6 +307,11 @@
                         <button onclick="randomizeAll()" class="random-btn">🎲 Rando My Imp!</button>
                     </div>
                 </div>
+            </div>
+            <!-- Color Controls Panel 
+            <div class="controls-panel">
+                
+                
 
                 <div id="loadingMessage" class="loading-message hidden">
                     Loading images...
@@ -295,16 +321,42 @@
                 </p>
             </div>
 
-            <!-- Canvas Display Area -->
-            <div class="canvas-area canvas-area-wrapper">
-                <div class="canvas-container">
-                    <canvas id="recolorCanvas"></canvas>
-                </div>
-            </div>
+            -->
 
         </main>
     </div>
 
+    <script type="text/javascript">
+        // 1. Initialize the single picker
+        const picker = new iro.ColorPicker("#iroPicker", {
+            width: 200,
+            color: "#ff0000"
+        });
+
+        let currentTargetInput = null;
+
+        // 2. Attach the picker to your 9 inputs
+        const allInputs = document.querySelectorAll('.imp-input'); // Use your actual class or 'input[type="color"]'
+
+        allInputs.forEach(input => {
+            // When you click an input, "focus" the picker on it
+            input.addEventListener('click', (e) => {
+                currentTargetInput = e.target;
+                picker.color.set(e.target.value); // Move wheel to current color
+            });
+
+            // When you change the color on the wheel, update the car and the input
+            picker.on('color:change', function(color) {
+                if (currentTargetInput) {
+                    currentTargetInput.value = color.hexString;
+                    
+                    // Trigger your existing change logic
+                    // (Assuming you have a function like 'updateCar()')
+                    currentTargetInput.dispatchEvent(new Event('input'));
+                }
+            });
+        });
+    </script>
     <script type="text/javascript">
         // Global references
         const canvas = document.getElementById('recolorCanvas');
@@ -579,5 +631,71 @@
             });
         };
     </script>
+
+<script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+
+<script>
+// 1. Initialize the iro.js Color Picker
+// Place a <div id="picker"></div> somewhere in your HTML above the controls
+const colorPicker = new iro.ColorPicker("#picker", {
+    width: 220,
+    color: "#50C878",
+    layout: [
+        { component: iro.ui.Wheel },
+        { component: iro.ui.Slider, options: { sliderType: 'value' } }
+    ]
+});
+
+let activeInput = document.getElementById('Skin'); // Default start
+
+// 2. Setup Channel Selection Logic
+const channelItems = document.querySelectorAll('.channel-item');
+
+channelItems.forEach(item => {
+    const input = item.querySelector('input[type="color"]');
+    if(!input) return;
+
+    item.addEventListener('click', () => {
+        // Update UI highlight
+        channelItems.forEach(i => i.classList.remove('active-channel'));
+        item.classList.add('active-channel');
+        
+        // Set the active input and move the wheel to match its color
+        activeInput = input;
+        colorPicker.color.set(input.value);
+    });
+});
+
+// 3. Update Imp when the Color Wheel moves
+colorPicker.on('color:change', function(color) {
+    if (activeInput) {
+        activeInput.value = color.hexString;
+        // This triggers your site's existing update function
+        activeInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+});
+
+// 4. Randomize Function
+function randomizeAll() {
+    const allInputs = document.querySelectorAll('.channel-item input[type="color"]');
+    
+    allInputs.forEach(input => {
+        const randomHex = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+        input.value = randomHex;
+        // Trigger the update for each channel
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+
+    // Sync the wheel to the current active input's new color
+    colorPicker.color.set(activeInput.value);
+}
+
+// 5. Run randomization on page load
+window.addEventListener('DOMContentLoaded', () => {
+    randomizeAll();
+    // Set the first item as active visually
+    document.querySelector('.channel-item').classList.add('active-channel');
+});
+</script>
 </body>
 </html>
