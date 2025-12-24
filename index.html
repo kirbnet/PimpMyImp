@@ -67,6 +67,26 @@
             .column-preview {
                 position: sticky;
                 top: 20px;
+                height: fit-content;
+            }
+        }
+
+        /* Mobile Sticky Logic */
+        @media (max-width: 767px) {
+            .column-preview {
+                position: -webkit-sticky; /* Support for Safari */
+                position: sticky;
+                top: 0;
+                z-index: 100; /* Stays above the color buttons */
+                background-color: var(--color-bg-body);
+                padding-bottom: 10px;
+                border-bottom: 2px solid var(--color-border-item);
+            }
+            
+            /* Shrink the canvas container slightly on mobile so it doesn't take half the screen */
+            .canvas-container {
+                max-width: 250px; 
+                margin: 0 auto;
             }
         }
 
@@ -332,8 +352,9 @@
         let activeInput = document.getElementById('Skin');
 
         // 1. Initialize iro.js
+        const pickerWidth = window.innerWidth < 480 ? 180 : 220;
         const picker = new iro.ColorPicker("#iroPicker", {
-            width: document.getElementById('picker-section').offsetWidth - 40, 
+            width: pickerWidth, 
             color: activeInput.value,
             layout: [
                 { component: iro.ui.Wheel },
